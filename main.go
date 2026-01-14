@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -60,6 +61,29 @@ func main() {
 	}
 	fmt.Println(style.Render("Loaded config for: " + cfg.Name))
 
+	var name string
+	flag.StringVar(&name, name, "", "name set")
+	flag.Parse()
+
+
+}
+
+// update the name/apikey of the user
+func UpdateConfig(name bool, apiKey bool, updatedName string, updatedApi string, style lipgloss.Style) error{
+	cfg, cfgPath, err := LoadConfig()
+	if err != nil{
+		fmt.Println(style.Render("Couldn't load config !"))
+		return err
+	}
+	if name && apiKey{
+		cfg = &Config{Name: updatedName, APIKey: updatedApi}
+		if err := SaveConfig(cfgPath, cfg); err != nil{
+			fmt.Println("Couldn't update the data !")
+			return err
+		}
+		fmt.Println(style.Render("Config Updated !!"))	
+	}
+	return nil
 }
 
 // Ask the user for one line of input in the terminal and return it (trimmed).
