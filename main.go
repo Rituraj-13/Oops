@@ -75,6 +75,22 @@ func UpdateConfig(name bool, apiKey bool, updatedName string, updatedApi string,
 		fmt.Println(style.Render("Couldn't load config !"))
 		return err
 	}
+	if name {
+		cfg = &Config{Name: updatedName}
+		if err := SaveConfig(cfgPath, cfg); err != nil{
+			fmt.Println("Couldn't update the data !")
+			return err
+		}
+		fmt.Println(style.Render("Config Updated !!"))	
+	}
+	if apiKey{
+		cfg = &Config{APIKey: updatedApi}
+		if err := SaveConfig(cfgPath, cfg); err != nil{
+			fmt.Println("Couldn't update the data !")
+			return err
+		}
+		fmt.Println(style.Render("Config Updated !!"))	
+	}
 	if name && apiKey{
 		cfg = &Config{Name: updatedName, APIKey: updatedApi}
 		if err := SaveConfig(cfgPath, cfg); err != nil{
