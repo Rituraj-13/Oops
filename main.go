@@ -31,11 +31,11 @@ func main() {
 	setValue := flag.String("value", "", "new value for the field provided by --set")
 	flag.Parse()
 
-	if strings.TrimSpace(*setField) != ""{
-		if err := UpdateConfig(*setField, *setValue, style); err != nil{
+	if strings.TrimSpace(*setField) != "" {
+		if err := UpdateConfig(*setField, *setValue, style); err != nil {
 			fmt.Fprintln(os.Stderr, "Update Failed:", err)
 			os.Exit(1)
-		} 
+		}
 	}
 
 	cfg, cfgPath, err := LoadConfig()
@@ -76,39 +76,38 @@ func main() {
 }
 
 // update the name/apikey of the user
-func UpdateConfig(setField string, setValue string, style lipgloss.Style) error{
+func UpdateConfig(setField string, setValue string, style lipgloss.Style) error {
 
 	field := strings.ToLower(strings.TrimSpace(setField))
 	value := strings.TrimSpace(setValue)
 
-	if value == ""{
+	if value == "" {
 		flag.Usage()
 		return errors.New("--value cannot be empty")
 	}
 
 	cfg, cfgPath, err := LoadConfig()
 
-	if err != nil{
+	if err != nil {
 		fmt.Println(style.Render("Couldn't load config !"))
 		return err
 	}
 
-	if cfg == nil{
+	if cfg == nil {
 		cfg = &Config{}
 	}
 
-
-	switch field{
+	switch field {
 	case "name":
 		cfg.Name = value
-	case "apikey" :
+	case "apikey":
 		cfg.APIKey = value
 	default:
 		flag.Usage()
 		return fmt.Errorf(`unknown field %q (use "name" or "apikey")`, setField)
 	}
 
-	if err := SaveConfig(cfgPath, cfg); err != nil{
+	if err := SaveConfig(cfgPath, cfg); err != nil {
 		return err
 	}
 	fmt.Println(style.Render("Config Updated! Saved to: " + cfgPath))
