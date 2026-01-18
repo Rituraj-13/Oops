@@ -26,6 +26,18 @@ func main() {
 		Foreground(lipgloss.Color("#FAFAFA")).
 		Width(30)
 
+	// Trying to get update data using Flags (fieldSelector + value)
+	setField := flag.String("set", "", `field to update "name" or "apiKey"`)
+	setValue := flag.String("value", "", "new value for the field provided by --set")
+	flag.Parse()
+
+	if strings.TrimSpace(*setField) != ""{
+		if err := UpdateConfig(*setField, *setValue, style); err != nil{
+			fmt.Fprintln(os.Stderr, "Update Failed:", err)
+			os.Exit(1)
+		} 
+	}
+
 	cfg, cfgPath, err := LoadConfig()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to load config: ", err)
@@ -61,44 +73,45 @@ func main() {
 	}
 	fmt.Println(style.Render("Loaded config for: " + cfg.Name))
 
-	var name string
-	flag.StringVar(&name, name, "", "name set")
-	flag.Parse()
-
-
 }
 
 // update the name/apikey of the user
-func UpdateConfig(name bool, apiKey bool, updatedName string, updatedApi string, style lipgloss.Style) error{
+func UpdateConfig(setField string, setValue string, style lipgloss.Style) error{
+
+	field := strings.ToLower(strings.TrimSpace(setField))
+	value := strings.TrimSpace(setValue)
+
+	if value == ""{
+		flag.Usage()
+		return errors.New("--value cannot be empty")
+	}
+
 	cfg, cfgPath, err := LoadConfig()
+
 	if err != nil{
 		fmt.Println(style.Render("Couldn't load config !"))
 		return err
 	}
-	if name {
-		cfg = &Config{Name: updatedName}
-		if err := SaveConfig(cfgPath, cfg); err != nil{
-			fmt.Println("Couldn't update the data !")
-			return err
-		}
-		fmt.Println(style.Render("Config Updated !!"))	
+
+	if cfg == nil{
+		cfg = &Config{}
 	}
-	if apiKey{
-		cfg = &Config{APIKey: updatedApi}
-		if err := SaveConfig(cfgPath, cfg); err != nil{
-			fmt.Println("Couldn't update the data !")
-			return err
-		}
-		fmt.Println(style.Render("Config Updated !!"))	
+
+
+	switch field{
+	case "name":
+		cfg.Name = value
+	case "apikey" :
+		cfg.APIKey = value
+	default:
+		flag.Usage()
+		return fmt.Errorf(`unknown field %q (use "name" or "apikey")`, setField)
 	}
-	if name && apiKey{
-		cfg = &Config{Name: updatedName, APIKey: updatedApi}
-		if err := SaveConfig(cfgPath, cfg); err != nil{
-			fmt.Println("Couldn't update the data !")
-			return err
-		}
-		fmt.Println(style.Render("Config Updated !!"))	
+
+	if err := SaveConfig(cfgPath, cfg); err != nil{
+		return err
 	}
+	fmt.Println(style.Render("Config Updated! Saved to: " + cfgPath))
 	return nil
 }
 
