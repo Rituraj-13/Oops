@@ -143,6 +143,10 @@ func configPath() (string, error) {
 	return filepath.Join(dir, "config.json"), nil // ? => C:\Users\Rituraj\AppData\Roaming\oops\config.json
 }
 
+func LastCommandPath()(string, error){
+	dir, err := os.
+}
+
 // Read the config file (if it exists) and decode it into a Config struct.
 func LoadConfig() (*Config, string, error) {
 	path, err := configPath() // ? will return the path of the config.json file
@@ -193,3 +197,9 @@ func SaveConfig(path string, cfg *Config) error {
 
 	return os.Rename(tmpName, path)
 }
+
+
+func CheckTerminalType(){
+
+}
+
