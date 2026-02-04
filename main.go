@@ -202,4 +202,3 @@ func SaveConfig(path string, cfg *Config) error {
 func CheckTerminalType(){
 
 }
-
